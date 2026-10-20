@@ -3,3 +3,4 @@ transformers>=4.44.0
 torch>=2.2.0
 captum>=0.7.0
 pandas>=2.0.0
+tiktoken>=0.7.0
