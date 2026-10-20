@@ -16,35 +16,67 @@ st.set_page_config(
     page_title="Multilingual Sentiment Inspector",
     page_icon="🧠",
     layout="wide",
-    initial_sidebar_state="expanded",
+    initial_sidebar_state="collapsed",
 )
 
 st.markdown(
     """
     <style>
-      .stApp { background: #f5f7fb; }
-      [data-testid="stHeader"] { background: rgba(245,247,251,0.92); }
-      .block-container { padding-top: 1.7rem; padding-bottom: 3rem; max-width: 1450px; }
+      :root {
+        --premium-blue: #174ea6;
+        --premium-blue-dark: #12366d;
+        --premium-blue-light: #eff6ff;
+        --border: #dbe5f1;
+        --muted: #64748b;
+      }
+      .stApp { background: #f7f9fc; color: #172b4d; }
+      [data-testid="stHeader"] { background: #ffffff; border-bottom: 1px solid #eef2f7; }
+      section[data-testid="stSidebar"], [data-testid="stSidebarCollapsedControl"] { display: none !important; }
+      .block-container { padding-top: 1.6rem; padding-bottom: 3rem; max-width: 1180px; }
       .hero {
-        padding: 1.8rem 2rem; border-radius: 22px; color: white;
-        background: linear-gradient(120deg, #111827 0%, #233e74 58%, #2563a6 100%);
-        margin-bottom: 1.2rem; box-shadow: 0 12px 28px rgba(15, 23, 42, .12);
+        padding: 1.8rem 2rem; border-radius: 18px; color: var(--premium-blue-dark);
+        background: #ffffff; border: 1px solid var(--border);
+        margin-bottom: 1.7rem; box-shadow: 0 8px 26px rgba(15, 35, 75, .045);
       }
-      .hero h1 { margin: 0 0 .45rem 0; font-size: 2rem; letter-spacing: -.035em; }
-      .hero p { margin: 0; color: #dbeafe; font-size: 1rem; }
-      .small-label { color: #64748b; font-size: .8rem; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; }
+      .hero h1 { margin: 0 0 .55rem 0; color: var(--premium-blue-dark); font-size: 2.05rem; letter-spacing: -.035em; }
+      .hero p { margin: 0; color: #315887; font-size: 1rem; line-height: 1.65; }
+      .hero .small-label { color: #2563c9; font-size: .78rem; font-weight: 750; text-transform: uppercase; letter-spacing: .09em; margin-bottom: .55rem; }
+      .small-label { color: #526987; font-size: .78rem; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; }
       .metric-card {
-        background: white; padding: 1rem 1.1rem; border: 1px solid #e2e8f0;
-        border-radius: 15px; height: 100%; box-shadow: 0 3px 12px rgba(15,23,42,.035);
+        background: #ffffff; padding: 1rem 1.1rem; border: 1px solid var(--border);
+        border-radius: 14px; height: 100%; box-shadow: 0 3px 12px rgba(15, 35, 75, .025);
       }
-      .metric-value { font-size: 1.5rem; line-height: 1.35; font-weight: 750; color: #0f172a; overflow-wrap: anywhere; }
-      .metric-note { margin-top: .2rem; color: #64748b; font-size: .83rem; }
-      div[data-testid="stForm"] { background: white; padding: 1rem 1.2rem; border: 1px solid #e2e8f0; border-radius: 16px; }
-      div.stButton > button, div[data-testid="stFormSubmitButton"] > button {
-        border-radius: 10px; min-height: 2.8rem; font-weight: 700;
+      .metric-value { font-size: 1.5rem; line-height: 1.35; font-weight: 750; color: #12366d; overflow-wrap: anywhere; }
+      .metric-note { margin-top: .2rem; color: var(--muted); font-size: .83rem; }
+      div[data-testid="stForm"] { background: #ffffff; padding: 1.15rem 1.25rem; border: 1px solid var(--border); border-radius: 16px; box-shadow: 0 4px 18px rgba(15, 35, 75, .025); }
+      div[data-testid="stTextArea"] label, label { color: #243f65; }
+      div[data-testid="stFormSubmitButton"] > button {
+        border-radius: 10px; min-height: 2.85rem; font-weight: 700;
+        color: #ffffff !important; border: 1px solid #174ea6 !important;
+        background: linear-gradient(135deg, #174ea6 0%, #2563c9 100%) !important;
+        box-shadow: 0 5px 14px rgba(23, 78, 166, .18);
+        transition: transform .15s ease, box-shadow .15s ease;
       }
-      h2, h3 { letter-spacing: -.02em; }
-      .note { color: #64748b; font-size: .9rem; }
+      div[data-testid="stFormSubmitButton"] > button:hover {
+        color: #ffffff !important; border-color: #12366d !important;
+        background: linear-gradient(135deg, #12366d 0%, #174ea6 100%) !important;
+        box-shadow: 0 7px 18px rgba(23, 78, 166, .24); transform: translateY(-1px);
+      }
+      div[data-testid="stDownloadButton"] > button {
+        border-radius: 9px; border: 1px solid #bfd3f4; color: #174ea6;
+        background: #eff6ff; font-weight: 650;
+      }
+      div[data-testid="stDownloadButton"] > button:hover {
+        border-color: #174ea6; color: #12366d; background: #e3efff;
+      }
+      h2, h3 { color: #173b70; letter-spacing: -.02em; }
+      .note { color: var(--muted); font-size: .9rem; }
+      div[data-testid="stDataFrame"] { border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+      @media (max-width: 640px) {
+        .block-container { padding-top: 1rem; }
+        .hero { padding: 1.35rem 1.2rem; }
+        .hero h1 { font-size: 1.65rem; }
+      }
     </style>
     """,
     unsafe_allow_html=True,
@@ -228,27 +260,10 @@ def analyse_text(text, model, tokenizer, model_device):
     }
 
 
-with st.sidebar:
-    st.markdown("## 🧠 Sentiment Inspector")
-    st.caption("Multilingual text classification + model inspection")
-    st.divider()
-    st.markdown("**Model checkpoint**")
-    st.code(MODEL_ID, language="text")
-    st.markdown("**Classes**")
-    st.write("Positive · Neutral · Negative")
-    st.markdown("**Inspection settings**")
-    st.write(f"Maximum input length: {MAX_LENGTH} tokens")
-    st.write(f"Integrated Gradients: {IG_STEPS} steps")
-    st.divider()
-    st.caption(
-        "The model was fine-tuned for sentiment on eight languages. It may work on more, "
-        "but predictions are not guaranteed to be accurate for every language or text type."
-    )
-
 st.markdown(
     """
     <div class="hero">
-      <div class="small-label" style="color:#bfdbfe; margin-bottom:.55rem;">AI · NLP · MODEL EXPLAINABILITY</div>
+      <div class="small-label">AI · NLP · MODEL EXPLAINABILITY</div>
       <h1>Multilingual Sentiment Inspector</h1>
       <p>Classify text as positive, neutral, or negative — then inspect how the model processes it.</p>
     </div>
@@ -256,28 +271,15 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-left, right = st.columns([1.25, 0.75], gap="large")
-with left:
-    st.subheader("1. Enter text")
-    with st.form("sentiment_form", clear_on_submit=False):
-        user_text = st.text_area(
-            "Text to analyse",
-            height=150,
-            placeholder="Enter a sentence in English, Urdu, Hindi, Arabic, Spanish, or another language…",
-            help="The text is truncated to 64 tokenizer tokens for classification and inspection.",
-        )
-        submitted = st.form_submit_button("Analyse text", type="primary", use_container_width=True)
-with right:
-    st.subheader("What this app reveals")
-    st.markdown(
-        """
-        **Prediction** — class and confidence score  
-        **Tokenization** — subword tokens, IDs, and source text  
-        **Embeddings** — initial and contextualized vectors  
-        **Word contributions** — Integrated Gradients explanation
-        """
+st.subheader("1. Enter text")
+with st.form("sentiment_form", clear_on_submit=False):
+    user_text = st.text_area(
+        "Text to analyse",
+        height=150,
+        placeholder="Enter a sentence in English, Urdu, Hindi, Arabic, Spanish, or another language…",
+        help="The text is truncated to 64 tokenizer tokens for classification and inspection.",
     )
-    st.info("The prediction uses the same pretrained checkpoint as your notebook; the model is not fine-tuned or replaced.")
+    submitted = st.form_submit_button("Analyse text", type="primary", use_container_width=True)
 
 if submitted:
     if not user_text.strip():
